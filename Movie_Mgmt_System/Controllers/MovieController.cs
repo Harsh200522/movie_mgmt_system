@@ -28,19 +28,27 @@ namespace Movie_Mgmt_System.Controllers
         public ActionResult Create()
         {
             string connectionString = ConfigurationManager.ConnectionStrings["dbconnection"].ToString();
-            SqlConnection connection = new SqlConnection(connectionString);
-            List<SelectListItem> list = new List<SelectListItem>();
-            SqlCommand cmd = new SqlCommand("Bind_Category",connection);
-            cmd.CommandType = CommandType.Text;
-            connection.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                list.Add(new SelectListItem { Text = reader["Cat_type"].ToString(), Value = reader["Cat_type"].ToString() });
+                List<SelectListItem> list = new List<SelectListItem>();
+                SqlCommand cmd = new SqlCommand("Bind_Category", connection);
+                cmd.CommandType = CommandType.StoredProcedure; 
+                connection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(new SelectListItem
+                    {
+                        Value = reader["Cat_id"].ToString(),  
+                        Text = reader["Cat_type"].ToString()
+                    });
+                }
+                connection.Close();
+                ViewBag.CategoryList = list;
             }
-            ViewBag.CategoryList = list;
             return View(new Movie());
         }
+
 
         // POST: Movie/Create
         [HttpPost]

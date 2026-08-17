@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.LoginSuccess != null)
+{
+    <h2>@ViewBag.LoginSuccess</h2>
+}
+@if (ViewBag.LoginFailed != null)
+{
+    <h2>@ViewBag.LoginFailed</h2>
+}
+
+
+
+
