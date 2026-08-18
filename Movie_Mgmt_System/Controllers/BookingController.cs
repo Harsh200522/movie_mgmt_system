@@ -47,8 +47,9 @@ namespace Movie_Mgmt_System.Controllers
             ViewBag.TotalPrice = total_price;
             return total_price;
         }
-        public int Get_User_id(int id)
+        public int Get_User_id()
         {
+            int id = 0;
             if (Session["Email"] != null) 
             { 
                 string connectionString = ConfigurationManager.ConnectionStrings["dbconnection"].ToString();
@@ -135,29 +136,32 @@ namespace Movie_Mgmt_System.Controllers
         {
             try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["dbconnection"].ToString();
-                SqlConnection connection = new SqlConnection(connectionString);
-                SqlCommand cmd = new SqlCommand("Insert_Booking", connection);
-                cmd.CommandType=CommandType.StoredProcedure;
-                connection.Open();
-                cmd.Parameters.AddWithValue("@User_id",Get_User_id(book.user_id));
-                cmd.Parameters.AddWithValue("@Cat_id",book.cat_id);
-                cmd.Parameters.AddWithValue("@Movie_id",book.movie_id);
-                cmd.Parameters.AddWithValue("@no_of_Tickets",book.no_of_ticket);
-                cmd.Parameters.AddWithValue("@amount", book.amount);
-                int i=cmd.ExecuteNonQuery();
-                connection.Close();
-                if (i >0)
+                if (ModelState.IsValid)
                 {
-                    ViewBag.Message = "Booking Insert Successfully";
-                    return View();
+                    string connectionString = ConfigurationManager.ConnectionStrings["dbconnection"].ToString();
+                    SqlConnection connection = new SqlConnection(connectionString);
+                    SqlCommand cmd = new SqlCommand("Insert_Booking", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    connection.Open();
+                    cmd.Parameters.AddWithValue("@User_id", Get_User_id());
+                    cmd.Parameters.AddWithValue("@Cat_id", book.cat_id);
+                    cmd.Parameters.AddWithValue("@Movie_id", book.movie_id);
+                    cmd.Parameters.AddWithValue("@no_of_Tickets", book.no_of_ticket);
+                    cmd.Parameters.AddWithValue("@amount", book.amount);
+                    int i = cmd.ExecuteNonQuery();
+                    connection.Close();
+                    if (i > 0)
+                    {
+                        ViewBag.Message = "Booking Insert Successfully";
+                        return View(book);
+                    }
                 }
 
                 return View();
             }
-            catch
+            catch(Exception ex)
             {
-                ViewBag.Error = "Insertion Failed";
+                ViewBag.Error = ex +" Insertion Failed";
                 return View(book);
             }
         }
