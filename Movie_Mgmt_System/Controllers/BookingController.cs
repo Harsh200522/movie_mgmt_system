@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -74,9 +75,28 @@ namespace Movie_Mgmt_System.Controllers
         }
 
         // GET: Booking/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details()
         {
-            return View();
+            string connectionString = ConfigurationManager.ConnectionStrings["dbconnection"].ToString();
+            SqlConnection connection = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand("Get_Booking", connection);
+            List<Booking> bookList = new List<Booking>();
+            cmd.CommandType = CommandType.StoredProcedure;
+            connection.Open();
+            cmd.Parameters.AddWithValue("@User_id", Get_User_id());
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Booking book = new Booking();
+                book.cat_name =reader["Cat_type"].ToString();
+                book.movie_name = reader["Movie_name"].ToString();
+                book.no_of_ticket = Convert.ToInt32(reader["No_of_Tickets"]);
+                book.amount = Convert.ToInt32(reader["amount"]);
+                bookList.Add(book);
+            }
+            reader.Close();
+            connection.Close();
+            return View(bookList);
         }
 
         // GET: Booking/Create
